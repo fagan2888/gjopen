@@ -7,18 +7,25 @@ import os
 import pandas as pd
 from io import StringIO
 import subprocess
+import logging
+
+logger = logging.getLogger(__name__)
 
 def download_file(url, dst, overwrite=False):
     """Download txt file by using wget command (requires wget installed on system)"""
     if os.path.exists(dst):
+        logger.info(f"File {dst} already exists.")
         if overwrite:
+            logger.info(f"Removing {dst}...")
             os.remove(dst)
         else:
             return
-    command = ["wget", url, "-o", dst]
+    command = ["wget", "-O", dst, url]
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
     output, error = process.communicate()
-    print(output, error)
+    logger.info(f"Downloaded {dst}.")
+    if error is not None:
+        logger.warning("Error in download_file:", output, error)
 
 def read_text_file(file_path):
     """Read a txt file"""
@@ -49,10 +56,9 @@ def read_noaa_txt(file_path):
     return pd.read_csv(processed_str_as_file, delim_whitespace=True)
     
 
-def download_and_read_noaa_txt(url, data_dir='data'):
+def download_and_read_noaa_txt(url, data_dir='data', overwrite=False):
     """Download and read a txt file from noaa.gov 
     e.g. ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_trend_gl.txt"""
     dst = os.path.join(data_dir, os.path.basename(url))
-    print("Saving file as", dst)
-    download_file(url, dst)
+    download_file(url, dst, overwrite=overwrite)
     return read_noaa_txt(dst)
