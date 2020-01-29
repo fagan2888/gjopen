@@ -6,8 +6,7 @@ import sys
 import logging
 
 # Configure logger
-def configure_logger(name='',
-                     console_logging_level=logging.INFO):
+def configure_logger(name='', console_logging_level=logging.INFO):
     """
     Configures logger
     from https://github.com/gmum/toolkit/blob/master/pytorch_project_template/src/utils.py
